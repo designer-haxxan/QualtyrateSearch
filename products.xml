@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROWSET>
+  <ROW>
+    <NAME>Cement OPC 53 Grade</NAME>
+    <RATE>1250</RATE>
+    <UNIT>Bag</UNIT>
+    <CATEGORY>Cement</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Cement PPC Grade</NAME>
+    <RATE>1180</RATE>
+    <UNIT>Bag</UNIT>
+    <CATEGORY>Cement</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Steel Rod 12mm</NAME>
+    <RATE>3200</RATE>
+    <UNIT>KG</UNIT>
+    <CATEGORY>Steel</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Steel Rod 10mm</NAME>
+    <RATE>3150</RATE>
+    <UNIT>KG</UNIT>
+    <CATEGORY>Steel</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Steel Rod 8mm</NAME>
+    <RATE>3100</RATE>
+    <UNIT>KG</UNIT>
+    <CATEGORY>Steel</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>White Paint 20L</NAME>
+    <RATE>4500</RATE>
+    <UNIT>Tin</UNIT>
+    <CATEGORY>Paint</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Emulsion Paint 10L</NAME>
+    <RATE>2200</RATE>
+    <UNIT>Tin</UNIT>
+    <CATEGORY>Paint</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>PVC Pipe 1 inch</NAME>
+    <RATE>85</RATE>
+    <UNIT>Meter</UNIT>
+    <CATEGORY>Pipe</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>PVC Pipe 2 inch</NAME>
+    <RATE>145</RATE>
+    <UNIT>Meter</UNIT>
+    <CATEGORY>Pipe</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Tile Floor 12x12</NAME>
+    <RATE>55</RATE>
+    <UNIT>Sq.ft</UNIT>
+    <CATEGORY>Tile</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Electrical Wire 1.5mm</NAME>
+    <RATE>38</RATE>
+    <UNIT>Meter</UNIT>
+    <CATEGORY>Electric</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Sand Fine</NAME>
+    <RATE>3500</RATE>
+    <UNIT>Truck</UNIT>
+    <CATEGORY>Material</CATEGORY>
+  </ROW>
+  <ROW>
+    <NAME>Brick Local</NAME>
+    <RATE>18</RATE>
+    <UNIT>Each</UNIT>
+    <CATEGORY>Material</CATEGORY>
+  </ROW>
+</ROWSET>
