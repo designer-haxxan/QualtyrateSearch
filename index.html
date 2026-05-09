@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Rate Finder</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1a56db;
+    --primary-dark: #1240a0;
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1a1d23;
+    --muted: #6b7280;
+    --border: #e2e6ef;
+    --green: #0e9f6e;
+    --red: #e02424;
+    --mic-active: #e02424;
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 1.1rem 1.2rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .header-icon {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.01em; }
+  .header p  { font-size: 0.78rem; opacity: 0.8; margin-top: 1px; }
+
+  /* SEARCH BAR */
+  .search-wrap {
+    padding: 1rem 1rem 0.5rem;
+    position: sticky;
+    top: 64px;
+    background: var(--bg);
+    z-index: 99;
+  }
+  .search-box {
+    display: flex;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  .search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background: transparent;
+    color: var(--text);
+  }
+  .search-box input::placeholder { color: var(--muted); }
+  .btn-mic {
+    width: 52px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    color: var(--muted);
+    transition: color 0.2s, background 0.2s;
+    border-left: 1px solid var(--border);
+  }
+  .btn-mic.listening {
+    color: var(--mic-active);
+    background: #fef2f2;
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    margin: 0.5rem 1rem 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 20px;
+  }
+  .badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-red   { background: #fee2e2; color: #991b1b; }
+  .badge-blue  { background: #dbeafe; color: #1e40af; }
+
+  /* VOICE HINT */
+  .voice-hint {
+    margin: 0.4rem 1rem 0;
+    padding: 0.5rem 0.85rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: #1e40af;
+    display: none;
+  }
+  .voice-hint.show { display: block; }
+
+  /* RESULTS */
+  .results { padding: 0.7rem 1rem 0; }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  .result-icon {
+    width: 44px; height: 44px;
+    border-radius: 11px;
+    background: #eff6ff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .result-body { flex: 1; min-width: 0; }
+  .result-name {
+    font-weight: 600;
+    font-size: 0.97rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .result-cat {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .result-rate {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .rate-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .rate-unit {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 2.8rem; margin-bottom: 0.7rem; }
+  .empty-state p { font-size: 0.9rem; }
+
+  /* LOADING */
+  .loading-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+    padding: 1.5rem 1rem 0;
+  }
+
+  mark { background: #fef9c3; border-radius: 3px; padding: 0 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">📦</div>
+  <div>
+    <h1>Product Rate Finder</h1>
+    <p>Search products &amp; get live rates</p>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Type or tap 🎤 to speak…" autocomplete="off" />
+    <button class="btn-mic" id="micBtn" title="Voice Search">🎤</button>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span id="statusText">Loading data…</span>
+  <span id="statusBadge"></span>
+</div>
+
+<div class="voice-hint" id="voiceHint">🎙️ Listening… Speak the product name now.</div>
+
+<div class="results" id="results">
+  <div class="loading-state">
+    <div class="spinner"></div>
+    Loading product rates…
+  </div>
+</div>
+
+<div class="footer" id="footer"></div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// Change this to your XML file URL when hosted on GitHub Pages
+const XML_URL = 'products.xml';
+
+// XML field names — match exactly what SQL Developer exports
+const FIELD_NAME = 'NAME';       // product name tag
+const FIELD_RATE = 'RATE';       // price/rate tag
+const FIELD_UNIT = 'UNIT';       // unit tag (optional)
+const FIELD_CAT  = 'CATEGORY';   // category tag (optional)
+const ROW_TAG    = 'ROW';        // each product row tag
+// ─────────────────────────────────────────────────────────────────────────────
+
+let allProducts = [];
+let recognition = null;
+
+// Category icon map
+const catIcons = {
+  default:   '📦',
+  cement:    '🧱',
+  steel:     '⚙️',
+  paint:     '🎨',
+  pipe:      '🔩',
+  wood:      '🪵',
+  electric:  '⚡',
+  chemical:  '🧪',
+  glass:     '🪟',
+  tile:      '🟫',
+};
+function getIcon(cat) {
+  if (!cat) return catIcons.default;
+  const c = cat.toLowerCase();
+  for (const k of Object.keys(catIcons)) {
+    if (c.includes(k)) return catIcons[k];
+  }
+  return catIcons.default;
+}
+
+// ─── LOAD XML ────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch(XML_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error('File not found');
+    const text = await res.text();
+    parseXML(text);
+  } catch (e) {
+    // Demo mode: load sample data when XML file not found
+    loadDemoData();
+  }
+}
+
+function parseXML(xmlText) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlText, 'text/xml');
+  const rows = doc.getElementsByTagName(ROW_TAG);
+  allProducts = [];
+  for (const row of rows) {
+    const name = row.getElementsByTagName(FIELD_NAME)[0]?.textContent?.trim();
+    const rate = row.getElementsByTagName(FIELD_RATE)[0]?.textContent?.trim();
+    const unit = row.getElementsByTagName(FIELD_UNIT)[0]?.textContent?.trim() || 'Unit';
+    const cat  = row.getElementsByTagName(FIELD_CAT)[0]?.textContent?.trim()  || '';
+    if (name && rate) {
+      allProducts.push({ name, rate: parseFloat(rate), unit, cat });
+    }
+  }
+  onDataReady('xml');
+}
+
+function loadDemoData() {
+  // Sample demo data — replace with real XML export
+  allProducts = [
+    { name: 'Cement OPC 53 Grade',   rate: 1250, unit: 'Bag',    cat: 'Cement'   },
+    { name: 'Cement PPC Grade',       rate: 1180, unit: 'Bag',    cat: 'Cement'   },
+    { name: 'Steel Rod 12mm',         rate: 3200, unit: 'KG',     cat: 'Steel'    },
+    { name: 'Steel Rod 10mm',         rate: 3150, unit: 'KG',     cat: 'Steel'    },
+    { name: 'Steel Rod 8mm',          rate: 3100, unit: 'KG',     cat: 'Steel'    },
+    { name: 'Steel Rod 16mm',         rate: 3280, unit: 'KG',     cat: 'Steel'    },
+    { name: 'White Paint 20L',        rate: 4500, unit: 'Tin',    cat: 'Paint'    },
+    { name: 'Emulsion Paint 10L',     rate: 2200, unit: 'Tin',    cat: 'Paint'    },
+    { name: 'PVC Pipe 1 inch',        rate: 85,   unit: 'Meter',  cat: 'Pipe'     },
+    { name: 'PVC Pipe 2 inch',        rate: 145,  unit: 'Meter',  cat: 'Pipe'     },
+    { name: 'GI Pipe 1 inch',         rate: 320,  unit: 'Meter',  cat: 'Pipe'     },
+    { name: 'Tile Floor 12x12',       rate: 55,   unit: 'Sq.ft',  cat: 'Tile'     },
+    { name: 'Tile Wall 8x12',         rate: 48,   unit: 'Sq.ft',  cat: 'Tile'     },
+    { name: 'Wood Plank Teak',        rate: 1800, unit: 'CFT',    cat: 'Wood'     },
+    { name: 'Electrical Wire 1.5mm',  rate: 38,   unit: 'Meter',  cat: 'Electric' },
+    { name: 'Electrical Wire 2.5mm',  rate: 58,   unit: 'Meter',  cat: 'Electric' },
+    { name: 'Glass Sheet 4mm',        rate: 220,  unit: 'Sq.ft',  cat: 'Glass'    },
+    { name: 'Sand Fine',              rate: 3500, unit: 'Truck',  cat: ''         },
+    { name: 'Gravel/Bajri',           rate: 4200, unit: 'Truck',  cat: ''         },
+    { name: 'Brick Local',            rate: 18,   unit: 'Each',   cat: ''         },
+  ];
+  onDataReady('demo');
+}
+
+function onDataReady(source) {
+  const now = new Date().toLocaleString('en-PK', { dateStyle:'medium', timeStyle:'short' });
+  document.getElementById('statusText').textContent = 'Updated: ' + now;
+  const badge = document.getElementById('statusBadge');
+  if (source === 'demo') {
+    badge.innerHTML = '<span class="badge badge-blue">Demo Data</span>';
+  } else {
+    badge.innerHTML = '<span class="badge badge-green">✓ Live</span>';
+  }
+  document.getElementById('footer').textContent =
+    allProducts.length + ' products loaded' + (source === 'demo' ? ' (replace products.xml for live data)' : '');
+  renderResults('');
+}
+
+// ─── SEARCH & RENDER ─────────────────────────────────────────────────────────
+function renderResults(query) {
+  const container = document.getElementById('results');
+  const q = query.trim().toLowerCase();
+
+  if (!q) {
+    // Show all
+    if (allProducts.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No products loaded.</p></div>';
+      return;
+    }
+    container.innerHTML = allProducts.map(p => cardHTML(p, '')).join('');
+    return;
+  }
+
+  // Fuzzy match: words in query
+  const words = q.split(/\s+/).filter(Boolean);
+  const matches = allProducts.filter(p => {
+    const haystack = (p.name + ' ' + p.cat).toLowerCase();
+    return words.every(w => haystack.includes(w));
+  });
+
+  if (matches.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="icon">🔍</div>
+      <p>No product found for "<strong>${esc(query)}</strong>"</p>
+      <p style="margin-top:0.4rem;font-size:0.8rem;">Try a shorter name or speak again</p>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = matches.map(p => cardHTML(p, q)).join('');
+}
+
+function cardHTML(p, q) {
+  const nameHL = q ? highlight(p.name, q) : esc(p.name);
+  const rate   = parseFloat(p.rate).toLocaleString('en-PK');
+  const icon   = getIcon(p.cat);
+  return `
+  <div class="result-card">
+    <div class="result-icon">${icon}</div>
+    <div class="result-body">
+      <div class="result-name">${nameHL}</div>
+      <div class="result-cat">${esc(p.cat) || 'General'}</div>
+    </div>
+    <div class="result-rate">
+      <div class="rate-value">Rs ${rate}</div>
+      <div class="rate-unit">per ${esc(p.unit)}</div>
+    </div>
+  </div>`;
+}
+
+function highlight(text, query) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  let out = esc(text);
+  words.forEach(w => {
+    const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+    out = out.replace(re, '<mark>$1</mark>');
+  });
+  return out;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ─── SEARCH INPUT ────────────────────────────────────────────────────────────
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  renderResults(searchInput.value);
+});
+
+// ─── VOICE SEARCH ────────────────────────────────────────────────────────────
+const micBtn   = document.getElementById('micBtn');
+const voiceHint = document.getElementById('voiceHint');
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+  micBtn.title = 'Voice search not supported in this browser';
+  micBtn.style.opacity = '0.4';
+  micBtn.disabled = true;
+} else {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    searchInput.value = transcript;
+    renderResults(transcript);
+    stopListening();
+  };
+
+  recognition.onerror = () => stopListening();
+  recognition.onend   = () => stopListening();
+
+  micBtn.addEventListener('click', () => {
+    if (micBtn.classList.contains('listening')) {
+      recognition.stop();
+      stopListening();
+    } else {
+      startListening();
+    }
+  });
+}
+
+function startListening() {
+  recognition.start();
+  micBtn.classList.add('listening');
+  micBtn.textContent = '⏹';
+  voiceHint.classList.add('show');
+}
+
+function stopListening() {
+  micBtn.classList.remove('listening');
+  micBtn.textContent = '🎤';
+  voiceHint.classList.remove('show');
+}
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
